@@ -1,4 +1,5 @@
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
 
-// このファイルは Next.js により自動生成・管理されます。
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.

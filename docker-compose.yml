@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   emotion-lens:
     build:
@@ -17,5 +15,6 @@ services:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     env_file:
-      - .env.local
+      - path: .env.local
+        required: false
     restart: unless-stopped

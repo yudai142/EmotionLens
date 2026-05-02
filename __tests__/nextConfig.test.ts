@@ -1,6 +1,6 @@
-import nextConfig from '../next.config';
+const nextConfig = require('../next.config.js');
 
-describe('next.config.ts', () => {
+describe('next.config.js', () => {
   it('standalone 出力を有効にしている', () => {
     expect(nextConfig.output).toBe('standalone');
   });
