@@ -24,11 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       # 3. 依存関係をインストール
       - name: npm 依存関係をインストール
-        run: npm ci
+        run: npm install
 
       # 4. TypeScript 型チェック
       - name: TypeScript 型チェック
