@@ -12,6 +12,7 @@ describe('next.config.ts', () => {
   it('webpack に esbuild-loader のルールを追加する', () => {
     const mockConfig = { module: { rules: [] as unknown[] } };
 
+    // WebpackConfigContext の必須プロパティをすべて満たすモック
     const result = nextConfig.webpack?.(mockConfig as never, {
       buildId: 'test',
       dev: true,
@@ -19,6 +20,9 @@ describe('next.config.ts', () => {
       defaultLoaders: {} as never,
       webpack: {} as never,
       nextRuntime: undefined,
+      dir: '/app',
+      config: {} as never,
+      totalPages: 1,
     });
 
     expect(result).toBe(mockConfig);
