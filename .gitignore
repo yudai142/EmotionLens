@@ -136,4 +136,5 @@ dist
 .pnp.*
 
 # Project planning docs
-md/
+.github/md/*
+.github/copilot-instructions.md
