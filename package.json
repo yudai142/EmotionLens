@@ -38,6 +38,7 @@
     "ts-node": "^10.9.2",
     "@testing-library/react": "^14.3.1",
     "@testing-library/jest-dom": "^6.4.6",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "yaml": "^2.4.5"
   }
 }
