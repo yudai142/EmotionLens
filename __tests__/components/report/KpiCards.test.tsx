@@ -54,18 +54,19 @@ describe('KpiCards', () => {
 
   it('セッション時間が計算・表示される', () => {
     render(<KpiCards session={mockSession} />);
-    // "1秒" または "1000ms" など時間を示すテキストがあるはず
-    expect(screen.getByText(/\d+\s*(秒|ms|分)/)).toBeInTheDocument();
+    // "1s" または同様のフォーマットで時間が表示される
+    expect(screen.getByText(/^\d+s$/)).toBeInTheDocument();
   });
 
   it('アラート件数が表示される', () => {
     render(<KpiCards session={mockSession} />);
-    expect(screen.getByText(/1|アラート|alert/i)).toBeInTheDocument();
+    const alertTexts = screen.getAllByText('1');
+    expect(alertTexts.length).toBeGreaterThan(0);
   });
 
   it('最大スコア感情が表示される', () => {
     render(<KpiCards session={mockSession} />);
-    // HAPPY が最大スコア（平均）なので表示されるはず
-    expect(screen.getByText(/喜び|最大|peak/i)).toBeInTheDocument();
+    // HAPPY が最大スコア（平均）なので喜びが表示されるはず
+    expect(screen.getByText('喜び')).toBeInTheDocument();
   });
 });

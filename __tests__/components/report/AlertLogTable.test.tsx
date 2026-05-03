@@ -40,13 +40,18 @@ describe('AlertLogTable', () => {
 
   it('感情ラベルが表示される', () => {
     render(<AlertLogTable session={mockSession} />);
-    expect(screen.getByText(/不安|ストレス|怒り/)).toBeInTheDocument();
+    // テーブルが存在することで、感情ラベルが含まれていることを確認
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    // 個別の感情が表示されていることを確認（テーブル内検索）
+    const table = screen.getByRole('table');
+    expect(table.textContent).toMatch(/不安|ストレス|怒り/);
   });
 
   it('スコアがパーセンテージで表示される', () => {
     render(<AlertLogTable session={mockSession} />);
-    // 75%, 82%, 68%
-    expect(screen.getByText(/75%|82%|68%/)).toBeInTheDocument();
+    const table = screen.getByRole('table');
+    // テーブル内にパーセンテージが含まれていることを確認
+    expect(table.textContent).toMatch(/75%|82%|68%/);
   });
 
   it('タイムスタンプが表示される', () => {
