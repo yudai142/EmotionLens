@@ -218,3 +218,329 @@ Next.jsでフロントとAPI Routesを同一基盤に統合し、Dockerで開発
 - Issueを段階分割して、MVPを先に固定する
 - 「調査タスク」を明示的にIssue化して見積もり不確実性を吸収する
 - React/Nextの深い最適化は本リリース後に段階導入し、先に価値検証を優先する
+
+---
+
+## 11. 前提条件・必要なツール
+
+### 必須
+
+- **Node.js**: 20.x 以上
+- **npm**: 10.x 以上（またはyarn）
+- **Git**: コマンドラインから実行可能
+- **Docker** + **Docker Compose**: 本番環境または Docker で実行する場合
+- **Hume.ai アカウント**: 感情解析 API キー取得用
+
+### 推奨
+
+- **VS Code**: 開発エディタ
+- **Chrome / Safari / Edge**: ブラウザ（マイク・カメラ許可で動作確認）
+
+---
+
+## 12. Hume.ai API キーの取得方法
+
+EmotionLens は Hume.ai の音声・表情解析 API を使用します。アプリ起動前に API キーを取得してください。
+
+### ステップ 1: Hume.ai に登録
+
+1. [Hume.ai 公式サイト](https://www.hume.ai) にアクセス
+2. 右上の **「Sign Up」** をクリック
+3. メールアドレスとパスワードでアカウント作成
+4. メール確認して本人確認完了
+
+### ステップ 2: API キーを生成
+
+1. ダッシュボード右上の **「Settings」** または **「API Keys」** にアクセス
+2. **「Create new API key」** をクリック
+3. キー名（例：`EmotionLens-Dev`）を入力
+4. **Secret Key も同時に表示** → 必ずコピーして保存（二度と表示されません）
+5. **API Key** と **Secret Key** 両方を別途保管
+
+⚠️ **重要**: Secret Key は絶対に GitHub に commit しないでください。`.env.local` / `.env` ファイルに記載し、`.gitignore` で除外してください。
+
+---
+
+## 13. インストール・セットアップ
+
+### 13-1. リポジトリをクローン
+
+```bash
+git clone https://github.com/yudai142/EmotionLens.git
+cd EmotionLens
+```
+
+### 13-2. 依存パッケージをインストール
+
+```bash
+npm install
+```
+
+### 13-3. 環境変数を設定
+
+`.env.example` をコピーして `.env.local` を作成：
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local` を編集して、Hume.ai から取得した API キーを設定：
+
+```env
+HUME_API_KEY=your_actual_hume_api_key_here
+HUME_SECRET_KEY=your_actual_hume_secret_key_here
+NODE_ENV=development
+```
+
+⚠️ `.env.local` は Git で管理されません（`.gitignore` で除外）
+
+---
+
+## 14. 開発環境での実行
+
+### 14-1. ローカル開発サーバー
+
+```bash
+npm run dev
+```
+
+- ブラウザで http://localhost:3000 を開く
+- マイク・カメラのブラウザ許可ダイアログが表示されたら **「許可」** をクリック
+- **「開始」** ボタンで会議画面シミュレーション開始
+
+### 14-2. ホットリロード対応 Docker 開発環境
+
+```bash
+npm run docker:dev
+```
+
+- コンテナ内で http://localhost:3000 が起動
+- ファイル変更が自動反映（ホットリロード）
+- `Ctrl+C` で停止
+
+Docker 開発環境の停止・クリーンアップ：
+
+```bash
+npm run docker:down
+```
+
+---
+
+## 15. 本番環境での実行（ローカル）
+
+本番用 Docker イメージをビルド・実行してテストできます：
+
+### 15-1. マルチステージビルド（最適化版）
+
+```bash
+npm run docker:prod
+```
+
+- `docker/Dockerfile.prod` でマルチステージビルド実行
+- deps → builder → runner 段階で最適化
+- `NODE_ENV=production` で起動
+- イメージサイズが開発版より大幅に削減
+
+### 15-2. 本番環境チェック
+
+```bash
+curl http://localhost:3000
+# または ブラウザで http://localhost:3000 を開く
+```
+
+### 15-3. 停止
+
+```bash
+npm run docker:down
+# または Ctrl+C でコンテナ停止
+```
+
+---
+
+## 16. トラブルシューティング
+
+### Q1: `HUME_API_KEY が設定されていません` エラーが表示される
+
+**原因**: `.env.local` ファイルが作成されていない、または環境変数が設定されていない
+
+**対策**:
+1. `.env.local` ファイルが存在するか確認
+   ```bash
+   ls -la .env.local
+   ```
+2. ファイルが存在しない場合は作成
+   ```bash
+   cp .env.example .env.local
+   ```
+3. HUME_API_KEY と HUME_SECRET_KEY を正しく設定
+4. サーバーを再起動
+   ```bash
+   npm run dev
+   # または
+   npm run docker:dev
+   ```
+
+### Q2: マイク・カメラが検出されない
+
+**原因**: ブラウザのメディア入力許可が無い、またはデバイスが接続されていない
+
+**対策**:
+1. ブラウザの許可設定を確認（Chrome アドレスバー左の 🔒 アイコン）
+2. **Microphone** と **Camera** が「Allow」になっているか確認
+3. デバイスが他のアプリで使用中でないか確認（Zoom など）
+4. ブラウザ再起動またはページ再読み込み（F5）
+
+### Q3: Docker 起動時に `address already in use` エラー
+
+**原因**: ポート 3000 が既に使用されている
+
+**対策**:
+```bash
+# ポート 3000 を使用しているプロセスを確認（macOS/Linux）
+lsof -i :3000
+
+# ポート 3000 を使用しているプロセスを確認（Windows）
+netstat -ano | findstr :3000
+
+# 停止
+npm run docker:down
+
+# 既存の Docker コンテナをすべてクリーンアップ
+docker system prune -a
+
+# 再度起動
+npm run docker:prod
+```
+
+### Q4: `npm install` でエラーが発生
+
+**原因**: Node.js バージョンが古い、または npm キャッシュが破損
+
+**対策**:
+```bash
+# Node.js バージョン確認（20.x 以上必須）
+node --version
+npm --version
+
+# npm キャッシュをクリア
+npm cache clean --force
+
+# 再度インストール
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Q5: Hume API 呼び出しで 401 / 403 エラー
+
+**原因**: API キーが無効または有効期限切れ
+
+**対策**:
+1. Hume.ai ダッシュボードで API キーの有効性確認
+2. キーが正しく `.env.local` に設定されているか確認
+3. 必要に応じて新しい API キーを生成
+4. `.env.local` を更新して保存
+5. サーバー再起動
+   ```bash
+   npm run dev
+   ```
+
+### Q6: 本番ビルド（docker:prod）が遅い
+
+**原因**: マルチステージビルドで deps → builder → runner を実行しているため初回は時間がかかる
+
+**対策**:
+- 初回は 1-3 分かかる場合があります
+- 以降のビルドはキャッシュが効くため高速化
+- イメージサイズを削減したい場合は `.dockerignore` を確認
+
+---
+
+## 17. デプロイ先の選択肢
+
+### Vercel（推奨・最も簡単）
+
+```bash
+# Vercel CLI をインストール
+npm install -g vercel
+
+# Vercel にデプロイ
+vercel
+```
+
+- マージ直後に自動デプロイ可能
+- 環境変数は Vercel ダッシュボード → Project Settings → Environment Variables で設定
+- HTTPS 無料、独自ドメイン対応
+
+**環境変数設定**:
+1. Vercel ダッシュボード → Project → Settings
+2. Environment Variables セクションで以下を追加
+   - `HUME_API_KEY`
+   - `HUME_SECRET_KEY`
+   - `NODE_ENV=production`
+
+### Railway（Docker ネイティブ）
+
+```bash
+# Railway CLI をインストール
+npm install -g railway
+
+# Railway にログイン
+railway login
+
+# デプロイ
+railway up
+```
+
+- `Dockerfile` と `docker-compose.yml` をそのまま使用可能
+- 月額制で無料枠あり
+
+### Render
+
+- Web Service として `npm run build && npm start` で実行
+- 環境変数を GUI で設定
+- 無料枠あり（スリープあり）
+
+---
+
+## 18. セキュリティに関する注意
+
+### 機密情報の管理
+
+- ✅ **API キーは `.env.local` / `.env` に記載**（Git 除外）
+- ✅ **API Routes からのみ API キーを使用**（クライアント側で露出しない）
+- ✅ **HTTPS でのアクセス**（本番環境では必須）
+- ❌ **Git Commit に `.env.local` / API キーを含めない**
+- ❌ **クライアント側の JavaScript に秘密鍵を書き込まない**
+
+### 本番運用のベストプラクティス
+
+1. **環境ごとに API キーを分ける**
+   - 開発環境用、テスト環境用、本番環境用
+2. **定期的にキーをローテーション**
+   - Hume.ai ダッシュボードで定期更新
+3. **アクセスログの監視**
+   - 異常なリクエストを検知
+4. **データ保持期間を設定**
+   - 会議ログ・感情データの削除ルール
+
+---
+
+## 19. ライセンス
+
+MIT License
+
+EmotionLens はオープンソースプロジェクトです。
+自由に使用・改変・配布できます。詳細は [LICENSE](./LICENSE) ファイルを参照してください。
+
+---
+
+## 20. サポート・フィードバック
+
+問題報告・機能リクエストは GitHub Issues で受け付けています。
+
+https://github.com/yudai142/EmotionLens/issues
+
+---
+
+**Last Updated**: 2025年1月
+**Version**: 0.1.0 (MVP)
