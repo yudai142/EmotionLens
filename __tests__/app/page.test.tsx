@@ -4,10 +4,10 @@
  * メイン画面が正しく構成要素を持つことを確認する
  */
 import { render, screen } from '@testing-library/react';
-import HomePage from '../../../app/page';
+import HomePage from '../../app/page';
 
 // コンポーネント内で使う Hooks をモック
-jest.mock('../../../hooks/useVideoCapture', () => ({
+jest.mock('../../hooks/useVideoCapture', () => ({
   useVideoCapture: () => ({
     isCapturing: false,
     error: null,
@@ -17,7 +17,7 @@ jest.mock('../../../hooks/useVideoCapture', () => ({
   }),
 }));
 
-jest.mock('../../../hooks/useAudioCapture', () => ({
+jest.mock('../../hooks/useAudioCapture', () => ({
   useAudioCapture: () => ({
     isCapturing: false,
     error: null,
@@ -26,7 +26,7 @@ jest.mock('../../../hooks/useAudioCapture', () => ({
   }),
 }));
 
-jest.mock('../../../hooks/useEmotionAnalysis', () => ({
+jest.mock('../../hooks/useEmotionAnalysis', () => ({
   useEmotionAnalysis: () => ({
     voiceScore: null,
     faceScore: null,
@@ -38,7 +38,7 @@ jest.mock('../../../hooks/useEmotionAnalysis', () => ({
   }),
 }));
 
-jest.mock('../../../hooks/useEmotionAlerts', () => ({
+jest.mock('../../hooks/useEmotionAlerts', () => ({
   useEmotionAlerts: () => ({
     alerts: [],
     latestAlert: null,
@@ -47,7 +47,7 @@ jest.mock('../../../hooks/useEmotionAlerts', () => ({
   }),
 }));
 
-jest.mock('../../../hooks/useSessionStore', () => ({
+jest.mock('../../hooks/useSessionStore', () => ({
   useSessionStore: () => ({
     session: null,
     isActive: false,
