@@ -2,7 +2,7 @@
 /**
  * Header コンポーネントのテスト
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Header } from '../../../components/layout/Header';
 
 jest.mock('next/link', () => {
@@ -49,7 +49,7 @@ describe('Header', () => {
   it('authStatus="unauthenticated" のときログインと新規登録ボタンが表示される', () => {
     render(<Header isActive={false} onStart={jest.fn()} onStop={jest.fn()} authStatus="unauthenticated" />);
     expect(screen.getByRole('link', { name: /ログイン/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /新規登録/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /新規登録/ })).toBeInTheDocument();
   });
 
   it('authStatus="authenticated" のときログアウトボタンが表示される', () => {
@@ -67,8 +67,10 @@ describe('Header', () => {
 
   it('新規登録リンクが /signup にポイントしている', () => {
     render(<Header isActive={false} onStart={jest.fn()} onStop={jest.fn()} authStatus="unauthenticated" />);
-    const signupLink = screen.getByRole('link', { name: /新規登録/ }) as HTMLAnchorElement;
-    expect(signupLink.href).toContain('/signup');
+    fireEvent.click(screen.getByRole('button', { name: /新規登録/ }));
+    expect(screen.getByRole('heading', { name: '新規登録' })).toBeInTheDocument();
+    expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
+    expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
   });
 
   it('ログアウトリンクが /api/auth/signout にポイントしている', () => {
