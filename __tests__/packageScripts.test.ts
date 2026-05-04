@@ -12,7 +12,7 @@ describe('package.json scripts', () => {
     expect(packageJson.scripts?.start).toBe('next start');
     expect(packageJson.scripts?.lint).toBe('next lint');
     expect(packageJson.scripts?.['docker:dev']).toBe('docker compose up --build');
-    expect(packageJson.scripts?.['docker:prod']).toBe('docker compose -f docker-compose.prod.yml up --build');
+    expect(packageJson.scripts?.['docker:prod']).toBeUndefined();
     expect(packageJson.scripts?.['docker:down']).toBe('docker compose down');
   });
 });

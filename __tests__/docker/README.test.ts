@@ -47,6 +47,14 @@ describe('README.md', () => {
     expect(readme).toMatch(/起動|Start|Run|npm run|docker/i);
   });
 
+  it('Docker Compose で PostgreSQL を一緒に起動する説明がある', () => {
+    expect(readme).toMatch(/docker compose|PostgreSQL|postgres/i);
+  });
+
+  it('docker-compose.prod.yml への依存がない', () => {
+    expect(readme).not.toMatch(/docker-compose\.prod\.yml|docker:prod/);
+  });
+
   it('保存データ運用の注意点がある', () => {
     expect(readme).toMatch(/保存データ|保持期間|ローテーション|ログイン中のみ|セッション保存/i);
   });

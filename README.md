@@ -325,7 +325,9 @@ npm run dev
 npm run docker:dev
 ```
 
-- コンテナ内で http://localhost:3000 が起動
+- `emotion-lens` と `postgres` が同時に起動
+- アプリは http://localhost:3000、PostgreSQL は localhost:5432 で利用可能
+- `DATABASE_URL` は compose 内で `postgres` サービスへ向く
 - ファイル変更が自動反映（ホットリロード）
 - `Ctrl+C` で停止
 
@@ -337,34 +339,26 @@ npm run docker:down
 
 ---
 
-## 15. 本番環境での実行（ローカル）
+## 15. Docker イメージのビルド
 
-本番用 Docker イメージをビルド・実行してテストできます：
+本番相当のアプリイメージを個別に確認したい場合は、compose ではなく `docker/Dockerfile.prod` を直接使います。
 
-### 15-1. マルチステージビルド（最適化版）
+### 15-1. マルチステージビルド
 
 ```bash
-npm run docker:prod
+docker build -f docker/Dockerfile.prod -t emotion-lens:prod .
 ```
 
-- `docker/Dockerfile.prod` でマルチステージビルド実行
 - deps → builder → runner 段階で最適化
-- `NODE_ENV=production` で起動
-- イメージサイズが開発版より大幅に削減
+- compose とは切り離してイメージ単体を確認できる
 
-### 15-2. 本番環境チェック
-
-```bash
-curl http://localhost:3000
-# または ブラウザで http://localhost:3000 を開く
-```
-
-### 15-3. 停止
+### 15-2. 単体起動例
 
 ```bash
-npm run docker:down
-# または Ctrl+C でコンテナ停止
+docker run --rm -p 3000:3000 --env-file .env.local emotion-lens:prod
 ```
+
+別コンテナまたはマネージド PostgreSQL を使う場合は、`DATABASE_URL` を実接続先に変更して起動します。
 
 ---
 
@@ -419,8 +413,8 @@ npm run docker:down
 # 既存の Docker コンテナをすべてクリーンアップ
 docker system prune -a
 
-# 再度起動
-npm run docker:prod
+   # 再度起動
+   npm run docker:dev
 ```
 
 ### Q4: `npm install` でエラーが発生
@@ -466,9 +460,9 @@ npm install
 4. 認証後に `/api/auth/me` が 200 を返すか確認
 5. 開発サーバーを再起動
 
-### Q7: 本番ビルド（docker:prod）が遅い
+### Q7: Docker イメージのビルドが遅い
 
-**原因**: マルチステージビルドで deps → builder → runner を実行しているため初回は時間がかかる
+**原因**: `docker/Dockerfile.prod` のマルチステージビルドで deps → builder → runner を実行しているため初回は時間がかかる
 
 **対策**:
 - 初回は 1-3 分かかる場合があります

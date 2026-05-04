@@ -9,7 +9,6 @@
     "lint": "next lint",
     "test": "jest",
     "docker:dev": "docker compose up --build",
-    "docker:prod": "docker compose -f docker-compose.prod.yml up --build",
     "docker:down": "docker compose down"
   },
   "dependencies": {
