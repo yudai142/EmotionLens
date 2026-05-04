@@ -37,7 +37,11 @@ export function Header({ isActive, onStart, onStop, authStatus = 'loading' }: He
           <button className="btn btn-ghost btn-sm" disabled>
             確認中...
           </button>
-        ) : authStatus === 'authenticated' ? null : (
+        ) : authStatus === 'authenticated' ? (
+          <Link href="/api/auth/signout?callbackUrl=/login" className="btn btn-ghost btn-sm">
+            ログアウト
+          </Link>
+        ) : (
           <>
             <Link href="/login" className="btn btn-ghost btn-sm">
               ログイン
