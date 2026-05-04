@@ -13,7 +13,7 @@ export interface UseEmotionAlertsReturn {
   /** 蓄積されたアラートリスト */
   alerts: EmotionAlert[];
   /** 感情スコアを渡してアラートを検出・追加する */
-  addScore: (score: EmotionScore) => void;
+  addScore: (score: EmotionScore) => EmotionAlert[];
   /** アラート履歴とクールダウン状態をリセットする */
   clearAlerts: () => void;
   /** 最後に追加されたアラート（なければ null） */
@@ -45,6 +45,8 @@ export function useEmotionAlerts(): UseEmotionAlertsReturn {
       });
       setAlerts((prev) => [...prev, ...filtered]);
     }
+
+    return filtered;
   }, []);
 
   const clearAlerts = useCallback(() => {
