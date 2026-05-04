@@ -5,36 +5,106 @@
  * セッション終了後に感情推移とアラート履歴を表示する
  */
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useSessionStore } from '../../hooks/useSessionStore';
 import type { SessionData } from '../../lib/types';
 import { KpiCards } from '../../components/report/KpiCards';
 import { EmotionTimeline } from '../../components/report/EmotionTimeline';
 import { EmotionDonut } from '../../components/report/EmotionDonut';
 import { AlertLogTable } from '../../components/report/AlertLogTable';
 
+type ReportStatus = 'loading' | 'ready' | 'empty' | 'unauthenticated' | 'error';
+
 export default function ReportPage() {
-  const { session } = useSessionStore();
   const [data, setData] = useState<SessionData | null>(null);
+  const [status, setStatus] = useState<ReportStatus>('loading');
 
   useEffect(() => {
-    // Local storage または context から session を復元
-    if (session) {
-      setData(session);
-    } else {
-      // localStorage から取得を試みる
-      const stored = localStorage.getItem('session-data');
-      if (stored) {
-        try {
-          setData(JSON.parse(stored));
-        } catch {
-          setData(null);
+    let cancelled = false;
+
+    async function loadLatestSession() {
+      try {
+        const response = await fetch('/api/sessions/latest', { cache: 'no-store' });
+
+        if (cancelled) {
+          return;
+        }
+
+        if (response.ok) {
+          const payload = (await response.json()) as { session: SessionData };
+          setData(payload.session);
+          setStatus('ready');
+          return;
+        }
+
+        if (response.status === 401) {
+          setStatus('unauthenticated');
+          return;
+        }
+
+        if (response.status === 404) {
+          setStatus('empty');
+          return;
+        }
+
+        setStatus('error');
+      } catch {
+        if (!cancelled) {
+          setStatus('error');
         }
       }
     }
-  }, [session]);
 
-  if (!data) {
+    void loadLatestSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (status === 'loading') {
+    return (
+      <div data-theme="emotion-dark" className="flex min-h-screen flex-col items-center justify-center bg-base-100">
+        <div className="card w-full max-w-md bg-base-200 shadow-xl">
+          <div className="card-body items-center text-center gap-3">
+            <h2 className="card-title text-lg">レポートを読み込み中です</h2>
+            <p className="text-sm text-el-muted">最新の保存済みセッションを取得しています</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return (
+      <div data-theme="emotion-dark" className="flex min-h-screen flex-col items-center justify-center bg-base-100">
+        <div className="card w-full max-w-md bg-base-200 shadow-xl">
+          <div className="card-body items-center text-center gap-4">
+            <h2 className="card-title text-lg">ログインするとレポートを表示できます</h2>
+            <p className="text-sm text-el-muted">保存済みセッションの閲覧にはログインが必要です</p>
+            <Link href="/login" className="btn btn-primary btn-sm">
+              ログインへ進む
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div data-theme="emotion-dark" className="flex min-h-screen flex-col items-center justify-center bg-base-100">
+        <div className="card w-full max-w-md bg-base-200 shadow-xl">
+          <div className="card-body items-center text-center gap-3">
+            <h2 className="card-title text-lg">レポートの取得に失敗しました</h2>
+            <p className="text-sm text-el-muted">時間をおいて再度お試しください</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'empty' || !data) {
     return (
       <div data-theme="emotion-dark" className="flex min-h-screen flex-col items-center justify-center bg-base-100">
         <div className="card w-full max-w-md bg-base-200 shadow-xl">
