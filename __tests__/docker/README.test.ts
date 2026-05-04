@@ -35,8 +35,24 @@ describe('README.md', () => {
     expect(readme).toMatch(/API|キー|key|Hume|設定/i);
   });
 
+  it('認証付き保存フローの前提がある', () => {
+    expect(readme).toMatch(/AUTH_SECRET|AUTH_DEMO_EMAIL|AUTH_DEMO_PASSWORD|認証/i);
+  });
+
+  it('DATABASE_URL の設定前提がある', () => {
+    expect(readme).toMatch(/DATABASE_URL|PostgreSQL|postgres/i);
+  });
+
   it('起動手順がある', () => {
     expect(readme).toMatch(/起動|Start|Run|npm run|docker/i);
+  });
+
+  it('保存データ運用の注意点がある', () => {
+    expect(readme).toMatch(/保存データ|保持期間|ローテーション|ログイン中のみ|セッション保存/i);
+  });
+
+  it('残課題または既知の制約がある', () => {
+    expect(readme).toMatch(/残課題|既知の制約|今後の改善|known issue/i);
   });
 
   it('トラブルシューティングがある', () => {

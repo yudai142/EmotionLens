@@ -58,4 +58,19 @@ describe('GET /api/sessions/latest', () => {
       },
     });
   });
+
+  it('取得処理が失敗した場合は 500 を返す', async () => {
+    mockedGetCurrentUser.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'user@example.com',
+      name: 'User',
+    });
+    mockedGetLatestSessionForUser.mockRejectedValueOnce(new Error('db error'));
+
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: 'Failed to fetch latest session.' });
+  });
 });

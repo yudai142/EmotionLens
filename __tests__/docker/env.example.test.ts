@@ -27,6 +27,19 @@ describe('.env.example', () => {
     expect(envExample).toMatch(/HUME_SECRET_KEY/);
   });
 
+  it('AUTH_SECRET が記載されている', () => {
+    expect(envExample).toMatch(/AUTH_SECRET/);
+  });
+
+  it('AUTH_DEMO_EMAIL と AUTH_DEMO_PASSWORD が記載されている', () => {
+    expect(envExample).toMatch(/AUTH_DEMO_EMAIL/);
+    expect(envExample).toMatch(/AUTH_DEMO_PASSWORD/);
+  });
+
+  it('DATABASE_URL が記載されている', () => {
+    expect(envExample).toMatch(/DATABASE_URL/);
+  });
+
   it('NODE_ENV が記載されている', () => {
     expect(envExample).toMatch(/NODE_ENV/);
   });

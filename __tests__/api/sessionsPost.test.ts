@@ -74,4 +74,26 @@ describe('POST /api/sessions', () => {
     expect(mockedSaveSessionForUser).toHaveBeenCalledWith('user-1', expect.objectContaining({ email: 'user@example.com' }), session);
     expect(body).toEqual({ sessionId: 's-1' });
   });
+
+  it('保存処理が失敗した場合は 500 を返す', async () => {
+    mockedGetCurrentUser.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'user@example.com',
+      name: 'User',
+    });
+    mockedSaveSessionForUser.mockRejectedValueOnce(new Error('db error'));
+
+    const session = {
+      sessionId: 's-1',
+      startedAt: Date.now(),
+      frames: [],
+      allAlerts: [],
+    };
+
+    const response = await POST(makeRequest({ session }));
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: 'Failed to save session.' });
+  });
 });
