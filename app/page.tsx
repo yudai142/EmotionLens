@@ -144,7 +144,7 @@ export default function HomePage() {
 
   return (
     <div data-theme="emotion-dark" className="flex h-screen flex-col bg-base-100 text-base-content">
-      <Header isActive={isActive} onStart={handleStart} onStop={() => void handleStop()} />
+      <Header isActive={isActive} onStart={handleStart} onStop={() => void handleStop()} authStatus={authStatus} />
       <div className="border-b border-el-border bg-base-200/60 px-4 py-2 text-sm text-el-muted">
         {sessionMessage}
       </div>

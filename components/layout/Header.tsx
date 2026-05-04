@@ -2,16 +2,21 @@
 
 /**
  * Header コンポーネント
- * アプリ名表示とセッション開始・停止ボタンを提供する
+ * アプリ名表示、セッション開始・停止ボタン、認証ボタンを提供する
  */
+
+import Link from 'next/link';
+
+type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 interface HeaderProps {
   isActive: boolean;
   onStart: () => void;
   onStop: () => void;
+  authStatus?: AuthStatus;
 }
 
-export function Header({ isActive, onStart, onStop }: HeaderProps) {
+export function Header({ isActive, onStart, onStop, authStatus = 'loading' }: HeaderProps) {
   return (
     <header className="navbar bg-base-200 border-b border-el-border px-4 shadow-md">
       <div className="flex-1">
@@ -26,6 +31,21 @@ export function Header({ isActive, onStart, onStop }: HeaderProps) {
           <button className="btn btn-primary btn-sm" onClick={onStart}>
             開始
           </button>
+        )}
+
+        {authStatus === 'loading' ? (
+          <button className="btn btn-ghost btn-sm" disabled>
+            確認中...
+          </button>
+        ) : authStatus === 'authenticated' ? null : (
+          <>
+            <Link href="/login" className="btn btn-ghost btn-sm">
+              ログイン
+            </Link>
+            <Link href="/signup" className="btn btn-primary btn-sm">
+              新規登録
+            </Link>
+          </>
         )}
       </div>
     </header>
