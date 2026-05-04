@@ -328,6 +328,7 @@ npm run docker:dev
 - `emotion-lens` と `postgres` が同時に起動
 - アプリは http://localhost:3000、PostgreSQL は localhost:5432 で利用可能
 - `DATABASE_URL` は compose 内で `postgres` サービスへ向く
+- 依存追加後も `node_modules` 匿名ボリュームを更新して起動する
 - ファイル変更が自動反映（ホットリロード）
 - `Ctrl+C` で停止
 

@@ -11,7 +11,7 @@ describe('package.json scripts', () => {
     expect(packageJson.scripts?.build).toBe('next build');
     expect(packageJson.scripts?.start).toBe('next start');
     expect(packageJson.scripts?.lint).toBe('next lint');
-    expect(packageJson.scripts?.['docker:dev']).toBe('docker compose up --build');
+    expect(packageJson.scripts?.['docker:dev']).toBe('docker compose up --build --renew-anon-volumes');
     expect(packageJson.scripts?.['docker:prod']).toBeUndefined();
     expect(packageJson.scripts?.['docker:down']).toBe('docker compose down');
   });
