@@ -52,8 +52,9 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: /新規登録/ })).toBeInTheDocument();
   });
 
-  it('authStatus="authenticated" のときログイン/新規登録ボタンは表示されない', () => {
+  it('authStatus="authenticated" のときログアウトボタンが表示される', () => {
     render(<Header isActive={false} onStart={jest.fn()} onStop={jest.fn()} authStatus="authenticated" />);
+    expect(screen.getByRole('link', { name: /ログアウト/ })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /ログイン/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /新規登録/ })).not.toBeInTheDocument();
   });
@@ -68,5 +69,11 @@ describe('Header', () => {
     render(<Header isActive={false} onStart={jest.fn()} onStop={jest.fn()} authStatus="unauthenticated" />);
     const signupLink = screen.getByRole('link', { name: /新規登録/ }) as HTMLAnchorElement;
     expect(signupLink.href).toContain('/signup');
+  });
+
+  it('ログアウトリンクが /api/auth/signout にポイントしている', () => {
+    render(<Header isActive={false} onStart={jest.fn()} onStop={jest.fn()} authStatus="authenticated" />);
+    const logoutLink = screen.getByRole('link', { name: /ログアウト/ }) as HTMLAnchorElement;
+    expect(logoutLink.href).toContain('/api/auth/signout');
   });
 });
