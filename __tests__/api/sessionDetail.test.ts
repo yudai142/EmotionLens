@@ -77,4 +77,21 @@ describe('GET /api/sessions/[sessionId]', () => {
       },
     });
   });
+
+  it('取得処理が失敗した場合は 500 を返す', async () => {
+    mockedGetCurrentUser.mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'user@example.com',
+      name: 'User',
+    });
+    mockedGetSessionByIdForUser.mockRejectedValueOnce(new Error('db error'));
+
+    const response = await GET(new Request('http://localhost/api/sessions/s-1'), {
+      params: { sessionId: 's-1' },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: 'Failed to fetch session.' });
+  });
 });
