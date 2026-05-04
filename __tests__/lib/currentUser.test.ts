@@ -10,7 +10,7 @@ jest.mock('../../auth', () => ({
 import { auth as mockAuth } from '../../auth';
 import { getCurrentUser, requireCurrentUser } from '../../lib/currentUser';
 
-const mockedAuth = mockAuth as jest.MockedFunction<typeof mockAuth>;
+const mockedAuth = mockAuth as unknown as jest.Mock<Promise<unknown>, []>;
 
 describe('currentUser helpers', () => {
   beforeEach(() => {
