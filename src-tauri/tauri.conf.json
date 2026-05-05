@@ -22,5 +22,12 @@
   "package": {
     "productName": "EmotionLens",
     "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "http": {
+        "scope": ["https://api.hume.ai/**"]
+      }
+    }
   }
 }

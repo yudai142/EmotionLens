@@ -1,12 +1,13 @@
 /**
  * useEmotionAnalysis Hook
- * /api/analyze-voice・/api/analyze-face へ非同期送信し、統合感情スコアを管理する
+ * Tauri Command を介して Rust の Hume AI 処理を呼び出し、統合感情スコアを管理する
  */
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
 import { EmotionScore } from '../lib/types';
 import { mergeScores } from '../lib/emotionEngine';
+import { analyzeVoice as analyzeVoiceCommand, analyzeFace as analyzeFaceCommand } from '../lib/hume';
 
 export interface UseEmotionAnalysisReturn {
   /** 音声解析のスコア */
@@ -23,16 +24,6 @@ export interface UseEmotionAnalysisReturn {
   isAnalyzing: boolean;
   /** エラーメッセージ（未エラー時は null） */
   error: string | null;
-}
-
-/** ArrayBuffer をブラウザ互換の base64 文字列に変換する */
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
 }
 
 export function useEmotionAnalysis(): UseEmotionAnalysisReturn {
@@ -65,19 +56,10 @@ export function useEmotionAnalysis(): UseEmotionAnalysisReturn {
       setIsAnalyzing(true);
       setError(null);
       try {
-        const audio = arrayBufferToBase64(buffer);
-        const res = await fetch('/api/analyze-voice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ audio }),
-        });
-        if (!res.ok) {
-          throw new Error(`音声解析 API エラー: ${res.status}`);
-        }
-        const data = (await res.json()) as { score: EmotionScore };
-        setVoiceScore(data.score);
-        voiceScoreRef.current = data.score;
-        updateMerged(data.score, faceScoreRef.current);
+        const score = await analyzeVoiceCommand(buffer);
+        setVoiceScore(score);
+        voiceScoreRef.current = score;
+        updateMerged(score, faceScoreRef.current);
       } catch (err) {
         setError(err instanceof Error ? err.message : '音声解析に失敗しました');
       } finally {
@@ -92,18 +74,10 @@ export function useEmotionAnalysis(): UseEmotionAnalysisReturn {
       setIsAnalyzing(true);
       setError(null);
       try {
-        const res = await fetch('/api/analyze-face', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: imageBase64 }),
-        });
-        if (!res.ok) {
-          throw new Error(`表情解析 API エラー: ${res.status}`);
-        }
-        const data = (await res.json()) as { score: EmotionScore };
-        setFaceScore(data.score);
-        faceScoreRef.current = data.score;
-        updateMerged(voiceScoreRef.current, data.score);
+        const score = await analyzeFaceCommand(imageBase64);
+        setFaceScore(score);
+        faceScoreRef.current = score;
+        updateMerged(voiceScoreRef.current, score);
       } catch (err) {
         setError(err instanceof Error ? err.message : '表情解析に失敗しました');
       } finally {
