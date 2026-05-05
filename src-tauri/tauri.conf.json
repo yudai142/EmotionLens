@@ -1,4 +1,7 @@
 {
+  "productName": "EmotionLens",
+  "version": "0.1.0",
+  "identifier": "com.emotionlens.app",
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
@@ -19,15 +22,8 @@
       "csp": null
     }
   },
-  "package": {
-    "productName": "EmotionLens",
-    "version": "0.1.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "http": {
-        "scope": ["https://api.hume.ai/**"]
-      }
-    }
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage", "dmg", "msi"]
   }
 }
