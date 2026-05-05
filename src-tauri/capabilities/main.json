@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "identifier": "main-window",
+  "description": "EmotionLens main window capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:window:allow-close",
+    "core:window:allow-set-fullscreen",
+    "core:fs:allow-read-dir",
+    "core:fs:allow-read",
+    "core:fs:allow-write"
+  ]
+}

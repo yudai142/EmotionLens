@@ -482,7 +482,159 @@ npm install
 
 ---
 
-## 17. ディストリビューション・デプロイ
+## 17. macOS パーミッション設定
+
+### ブラウザパーミッション（カメラ・マイク）
+
+EmotionLens はビデオ会議中の音声と表情を解析するため、ブラウザのカメラ・マイクへのアクセスを要求します。
+
+**初回アクセス時の操作:**
+
+1. EmotionLens を起動
+2. 「アクセスを許可する」ボタンをクリック
+3. ブラウザのパーミッション要求ダイアログが表示される
+4. 「許可」をクリック
+
+**PermissionsPrompt コンポーネントについて:**
+
+- `src/components/macOS/PermissionsPrompt.tsx` がカメラ・マイク許可を管理
+- ユーザーの対応状況は `localStorage` に保存
+- 後で対応を選択した場合、ホーム画面の設定メニューで再度要求可能
+
+### システム設定でのアクセス確認（macOS）
+
+パーミッションが拒否された場合、以下の手順で確認してください：
+
+**カメラアクセスの確認:**
+1. Apple メニュー > システム設定
+2. プライバシーとセキュリティ > カメラ
+3. EmotionLens（ブラウザ）が許可リストに含まれてるか確認
+4. 含まれていない場合は「許可」をクリック
+
+**マイクアクセスの確認:**
+1. Apple メニュー > システム設定
+2. プライバシーとセキュリティ > 録音
+3. EmotionLens（ブラウザ）が許可リストに含まれているか確認
+4. 含まれていない場合は「許可」をクリック
+
+### パーミッション拒否時の対応
+
+- 拒否した場合、再度許可を求めるには**ブラウザの接続情報をリセット**する必要があります
+- Chrome/Safari/Edge 各ブラウザのキャッシュ・サイトデータを削除後、再度アクセス
+- または PermissionsPrompt コンポーネントから「アクセスを許可する」を再度クリック
+
+---
+
+## 18. クロスプラットフォームビルド
+
+EmotionLens は Tauri により、Windows・Linux・macOS のネイティブアプリケーションとしてビルド可能です。
+
+### 前提条件
+
+**全プラットフォーム共通:**
+- Node.js 18.x 以上
+- Rust toolchain (`rustup` で前提条件を自動インストール)
+- npm 9.x 以上
+
+**macOS:**
+- Xcode Command Line Tools
+- ```bash
+  xcode-select --install
+  ```
+
+**Windows:**
+- Microsoft C++ Build Tools または Visual Studio 2022 Community Edition
+- Windows 11/10 Pro 以上（Home では App Installer に制限あり）
+
+**Linux:**
+- `libssl-dev`, `libwebkit2gtk-4.1-dev`, `libappindicator3-dev`, `librsvg2-dev` 等
+- Ubuntu/Debian:
+  ```bash
+  sudo apt-get install -y libssl-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
+  ```
+- Fedora:
+  ```bash
+  sudo dnf install -y openssl-devel webkit2gtk4.1-devel libappindicator-gtk3-devel librsvg2-devel
+  ```
+
+### ビルドコマンド
+
+**開発モード（ホットリロード）:**
+```bash
+npm run tauri:dev
+```
+
+**本番ビルド（すべてのプラットフォーム）:**
+```bash
+npm run tauri:build
+```
+
+**プラットフォーム別ビルド:**
+
+#### macOS (Intel/Apple Silicon)
+```bash
+npm run tauri:build:macos
+# または
+cargo tauri build --target universal-apple-darwin
+```
+- 出力: `src-tauri/target/release/bundle/dmg/*.dmg` / `src-tauri/target/release/bundle/macos/*.app`
+- Intel/Apple Silicon 両対応の Universal Binary として生成
+
+#### Windows (x86_64)
+```bash
+npm run tauri:build:windows
+```
+- 出力: `src-tauri/target/release/bundle/msi/*.msi`
+- MSVC ビルドツールが必須
+- インストーラー形式（.msi）で自動生成
+
+#### Linux (x86_64)
+```bash
+npm run tauri:build:linux
+```
+- 出力: `src-tauri/target/release/bundle/`
+  - AppImage: `src-tauri/target/release/bundle/appimage/*.AppImage`
+  - .deb: `src-tauri/target/release/bundle/deb/*.deb`
+- AppImage でも .deb でも配布可能
+
+### リリースビルドの署名（オプション）
+
+#### macOS App Store 提出・notarization
+```bash
+# Notarization 前に証明書の設定が必要
+# See: https://tauri.app/en/v1/guides/distribution/sign-macos
+```
+
+#### Windows コード署名
+```bash
+# EV Certificate が必要
+# src-tauri/tauri.conf.json で signingIdentity を設定可能
+```
+
+### ビルド出力の確認
+
+各ビルド完了後、以下の場所に実行ファイル/インストーラーが生成されます：
+
+- **macOS**: `.app` bundle または `.dmg` イメージ
+- **Windows**: `.msi` インストーラー
+- **Linux**: `.AppImage` または `.deb` パッケージ
+
+### GitHub Releases での配布
+
+リリース時は以下を GitHub Releases にアップロード：
+
+```bash
+gh release create v1.0.0 \
+  src-tauri/target/release/bundle/dmg/*.dmg \  # macOS
+  src-tauri/target/release/bundle/msi/*.msi \  # Windows
+  src-tauri/target/release/bundle/appimage/*.AppImage \  # Linux
+  --title "EmotionLens 1.0.0" \
+  --notes "Release notes"
+```
+
+---
+
+## 19. ディストリビューション・デプロイ
 
 ### ネイティブアプリ配布
 
@@ -546,7 +698,7 @@ railway up
 
 ---
 
-## 18. セキュリティに関する注意
+## 20. セキュリティに関する注意
 
 ### 機密情報の管理
 
@@ -573,7 +725,7 @@ railway up
 
 ---
 
-## 19. 認証付き保存フローの運用メモ
+## 21. 認証付き保存フローの運用メモ
 
 - ログイン済みユーザーのみ `POST /api/sessions` を通じてセッションを永続化する
 - レポート画面は `GET /api/sessions/latest` でログインユーザー自身の最新データのみ取得する
@@ -589,7 +741,7 @@ railway up
 
 ---
 
-## 20. ライセンス
+## 22. ライセンス
 
 MIT License
 
@@ -598,7 +750,7 @@ EmotionLens はオープンソースプロジェクトです。
 
 ---
 
-## 21. サポート・フィードバック
+## 23. サポート・フィードバック
 
 問題報告・機能リクエストは GitHub Issues で受け付けています。
 
