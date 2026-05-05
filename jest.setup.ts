@@ -8,3 +8,13 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   unobserve: jest.fn(),
   disconnect: jest.fn(),
 }));
+
+// Tauri API をモック
+jest.mock('@tauri-apps/api', () => ({
+  invoke: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@tauri-apps/api/event', () => ({
+  listen: jest.fn(),
+  emit: jest.fn(),
+}));

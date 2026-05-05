@@ -8,9 +8,13 @@ describe('App コンポーネント', () => {
     expect(screen.getByText('EmotionLens')).toBeInTheDocument()
   })
 
-  it('カウンターボタンが存在すること', () => {
+  it('セットアップメッセージが表示されること', () => {
     render(<App />)
-    const button = screen.getByRole('button', { name: /count is/i })
-    expect(button).toBeInTheDocument()
+    expect(screen.getByText('セットアップ中...')).toBeInTheDocument()
+  })
+
+  it('ビデオ会議中の感情をリアルタイム解析テキストが表示されること', () => {
+    render(<App />)
+    expect(screen.getByText('ビデオ会議中の感情をリアルタイム解析')).toBeInTheDocument()
   })
 })
