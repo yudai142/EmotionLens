@@ -20,7 +20,8 @@
     "recharts": "^2.12.7",
     "@mediapipe/face_mesh": "^0.4.1633559619",
     "@mediapipe/camera_utils": "^0.3.1675466862",
-    "daisyui": "^4.12.10"
+    "daisyui": "^4.12.10",
+    "@tauri-apps/api": "^2.0.0"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.0.0",
