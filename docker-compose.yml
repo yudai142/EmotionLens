@@ -6,10 +6,13 @@ services:
     container_name: emotion-lens-dev
     ports:
       - '3000:3000'
+      - '8080:8080'
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.next
+      - /app/target
+      - /root/.cargo
     depends_on:
       postgres:
         condition: service_healthy
@@ -18,6 +21,8 @@ services:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/emotion_lens
+      - RUST_BACKTRACE=1
+      - CARGO_NET_OFFLINE=false
     env_file:
       - path: .env.local
         required: false

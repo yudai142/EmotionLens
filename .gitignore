@@ -139,3 +139,10 @@ dist
 .github/md/*
 .github/copilot-instructions.md
 .claude/CLAUDE.md
+
+# Tauri build artifacts
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# macOS specific
+.DS_Store
