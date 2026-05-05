@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { verifyAuthUser } from './lib/authUserRepository';
 
 const demoEmail = process.env.AUTH_DEMO_EMAIL;
 const demoPassword = process.env.AUTH_DEMO_PASSWORD;
@@ -18,23 +19,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      authorize(credentials) {
+      async authorize(credentials) {
         if (typeof credentials?.email !== 'string' || typeof credentials?.password !== 'string') {
           return null;
         }
 
+        const email = credentials.email.trim().toLowerCase();
+        const password = credentials.password;
+
         if (!demoEmail || !demoPassword) {
-          return null;
+          const user = await verifyAuthUser({ email, password });
+          if (!user) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.displayName ?? 'EmotionLens User',
+            email: user.email,
+          };
         }
 
-        if (credentials.email !== demoEmail || credentials.password !== demoPassword) {
+        if (email === demoEmail && password === demoPassword) {
+          return {
+            id: 'demo-user',
+            name: 'Demo User',
+            email: demoEmail,
+          };
+        }
+
+        const user = await verifyAuthUser({ email, password });
+        if (!user) {
           return null;
         }
 
         return {
-          id: 'demo-user',
-          name: 'Demo User',
-          email: demoEmail,
+          id: user.id,
+          name: user.displayName ?? 'EmotionLens User',
+          email: user.email,
         };
       },
     }),
