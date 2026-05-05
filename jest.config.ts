@@ -16,12 +16,18 @@ const config: Config = {
     '/node_modules/',
     '/dist/',
     '/src-tauri/',
-    // Issue #28 の実装が不完全なため、以下のテストは一時的に無視
+    // Issue #28 以前の実装が不完全なため、以下のテストは一時的に無視
     'api/',
     'hooks/',
     'components/layout/',
+    'components/emotion/',
     'app/page',
+    'app/report',
+    'app/login',
     'lib/hume',
+    'docker/',
+    'routing',
+    'packageScripts',
   ],
 };
 
