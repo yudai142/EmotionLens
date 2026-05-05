@@ -11,6 +11,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { VideoCapture } from '../components/video/VideoCapture';
 import { FaceLandmarkOverlay } from '../components/video/FaceLandmarkOverlay';
 import { EmotionBadge } from '../components/video/EmotionBadge';
+import { MirrorAppBadge } from '../components/video/MirrorAppBadge';
 import { EmotionAlertBanner } from '../components/emotion/EmotionAlert';
 import { EmotionPanel } from '../components/emotion/EmotionPanel';
 import { AlertHistory } from '../components/emotion/AlertHistory';
@@ -19,6 +20,7 @@ import { useAudioCapture } from '../hooks/useAudioCapture';
 import { useEmotionAnalysis } from '../hooks/useEmotionAnalysis';
 import { useEmotionAlerts } from '../hooks/useEmotionAlerts';
 import { useSessionStore } from '../hooks/useSessionStore';
+import { useMirrorApp } from '../hooks/useMirrorApp';
 import type { SessionData } from '../lib/types';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -30,6 +32,7 @@ export default function HomePage() {
   const { mergedScore, analyzeVoice, analyzeFace } = useEmotionAnalysis();
   const { alerts, latestAlert, addScore, clearAlerts } = useEmotionAlerts();
   const { isActive, startSession, endSession, addFrame } = useSessionStore();
+  const { currentApp } = useMirrorApp();
   const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
@@ -155,7 +158,10 @@ export default function HomePage() {
           <section className="flex flex-col gap-3 md:w-1/2">
             <div className="relative">
               <VideoCapture isActive={videoActive} videoRef={videoRef}>
-                <EmotionBadge score={mergedScore} />
+                <div className="flex flex-col gap-2">
+                  <EmotionBadge score={mergedScore} />
+                  <MirrorAppBadge app={currentApp} />
+                </div>
               </VideoCapture>
               <FaceLandmarkOverlay videoRef={videoRef} isActive={videoActive} />
             </div>
