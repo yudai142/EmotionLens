@@ -1,25 +1,23 @@
-import { useState } from 'react'
-import './App.css'
+/**
+ * EmotionLens メインアプリケーション
+ * React Router SPA ルーティング設定
+ */
+
+import { Routes, Route } from 'react-router-dom';
+import RootLayout from './layout/RootLayout';
+import HomePage from './pages/HomePage';
+import ReportPage from './pages/ReportPage';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="container">
-      <h1>EmotionLens</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Tauri, Vite, and React logos to learn more
-      </p>
-    </div>
-  )
+    <RootLayout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/report" element={<ReportPage />} />
+      </Routes>
+    </RootLayout>
+  );
 }
 
-export default App
+export default App;
+
