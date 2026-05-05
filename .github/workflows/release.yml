@@ -12,11 +12,8 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create_release.outputs.id }}
     steps:
       - name: リリースを作成
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           draft: true
@@ -25,7 +22,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
-    needs: create-release
     runs-on: macos-latest
     strategy:
       matrix:
@@ -57,15 +53,12 @@ jobs:
       - name: macOS ビルドをリリースにアップロード
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
           files: |
             src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
-            src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows:
-    needs: create-release
     runs-on: windows-latest
     steps:
       - name: リポジトリをチェックアウト
@@ -88,10 +81,8 @@ jobs:
       - name: Windows ビルドをリリースにアップロード
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
           files: |
             src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -105,3 +96,4 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
