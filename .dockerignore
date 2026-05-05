@@ -6,3 +6,6 @@ node_modules
 .DS_Store
 README.md
 docker-compose.yml
+target
+Cargo.lock
+.cargo

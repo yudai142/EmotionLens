@@ -2,10 +2,38 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Rust + Tauri 開発環境のシステムパッケージをインストール
+RUN apk add --no-cache \
+    build-base \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    gif-dev \
+    pixman-dev \
+    libwebp-dev \
+    curl \
+    wget \
+    gcc \
+    g++ \
+    make \
+    python3 \
+    openssl-dev
+
+# Rust toolchain をインストール
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    chmod -R a+w /root/.cargo
+
+# Rust PATH を設定
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Tauri CLI をグローバルインストール
+RUN npm install -g @tauri-apps/cli
+
+# プロジェクト依存関係のインストール
 COPY package.json ./
 RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 3000 8080
 CMD ["npm", "run", "dev"]
